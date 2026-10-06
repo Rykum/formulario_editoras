@@ -39,6 +39,22 @@ test('shows the four survey sections and exactly ten question groups', () => {
   }
 });
 
+test('uses a contemporary visual system with a highlighted hero and card-based form sections', () => {
+  const styles = readSurveySources()['Styles.html'];
+  const root = styles.match(/:root\s*{([\s\S]*?)}/)?.[1] || '';
+  const hero = styles.match(/\.hero\s*{([\s\S]*?)}/)?.[1] || '';
+  const formSection = styles.match(/\.form-section\s*{([\s\S]*?)}/)?.[1] || '';
+
+  assert.match(root, /--forest:\s*#[0-9a-f]{6}/i);
+  assert.match(root, /--mint:\s*#[0-9a-f]{6}/i);
+  assert.match(hero, /background:/);
+  assert.match(hero, /border-radius:\s*\d+px/);
+  assert.match(formSection, /background:\s*var\(--surface\)/);
+  assert.match(formSection, /border-radius:\s*\d+px/);
+  assert.match(styles, /@media\s*\(max-width:\s*860px\)/);
+  assert.match(styles, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
+});
+
 test('choice groups use visible legends and labels associated with their controls', () => {
   const { 'Index.html': page } = readSurveySources();
   for (const question of [3, 4, 5, 6, 7, 8, 10]) {
