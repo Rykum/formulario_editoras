@@ -49,6 +49,57 @@ test('does not store activity answers when the publisher reports no AI use', () 
   assert.equal(row[SURVEY_HEADERS.indexOf('Atividades')], '');
 });
 
+test('rejects malformed option data in hidden conditional fields before storage', () => {
+  const invalidActivity = validateSubmission({ ...validSubmission(), usesAI: 'no', activities: ['invented'] });
+  const malformedRestriction = validateSubmission({ ...validSubmission(), reviewerGuidance: 'unrestricted', reviewerRestrictions: 'confidentiality' });
+  assert.equal(invalidActivity.ok, false);
+  assert.ok(invalidActivity.errors.includes('activities'));
+  assert.equal(malformedRestriction.ok, false);
+  assert.ok(malformedRestriction.errors.includes('reviewerRestrictions'));
+});
+
+test('accepts open text at the public form limits', () => {
+  const boundarySubmission = validSubmission({
+    publisher: 'E'.repeat(200),
+    institution: 'I'.repeat(200),
+    policyUrl: 'https://example.org/' + 'p'.repeat(2028),
+    otherActivity: 'a'.repeat(500),
+    otherRestriction: 'r'.repeat(500),
+    otherBenefit: 'b'.repeat(500),
+    otherConcern: 'c'.repeat(500),
+    futurePriority: 'f'.repeat(2000)
+  });
+  const result = validateSubmission(boundarySubmission);
+  assert.equal(result.ok, true);
+});
+
+test('rejects open text over the public form limits even when conditional fields are hidden', () => {
+  const cases = [
+    ['publisher', 'P'.repeat(201)],
+    ['institution', 'I'.repeat(201)],
+    ['policyUrl', 'https://example.org/' + 'p'.repeat(2029)],
+    ['otherActivity', 'a'.repeat(501)],
+    ['otherRestriction', 'r'.repeat(501)],
+    ['otherBenefit', 'b'.repeat(501)],
+    ['otherConcern', 'c'.repeat(501)],
+    ['futurePriority', 'f'.repeat(2001)]
+  ];
+
+  for (const [field, value] of cases) {
+    const result = validateSubmission({ ...validSubmission(), [field]: value });
+    assert.equal(result.ok, false, `${field} should be bounded`);
+    assert.ok(result.errors.includes(field), `${field} should identify its validation error`);
+  }
+});
+
+test('rejects non-string open text fields', () => {
+  for (const field of ['otherActivity', 'policyUrl', 'otherRestriction', 'otherBenefit', 'otherConcern', 'futurePriority']) {
+    const result = validateSubmission({ ...validSubmission(), [field]: { value: 'unexpected' } });
+    assert.equal(result.ok, false, `${field} should be a string`);
+    assert.ok(result.errors.includes(field));
+  }
+});
+
 test('stores formula-like respondent text as literal text', () => {
   const row = buildResponseRow({ ...validSubmission(), publisher: '=2+2' }, new Date('2026-10-06T12:00:00Z'), 'id-1');
   assert.equal(row[2], "'=2+2");

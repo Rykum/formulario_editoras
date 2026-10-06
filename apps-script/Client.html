@@ -35,6 +35,16 @@ function getSubmissionNotice(result) {
   if (result && result.ok === true) {
     return { kind: 'success', message: 'Resposta registrada.' };
   }
+  const safeMessages = [
+    'Não foi possível validar o envio.',
+    'Não foi possível validar o envio. Atualize a página e tente novamente.',
+    'Revise os campos destacados.',
+    'Você já enviou uma resposta recentemente. Aguarde antes de tentar novamente.',
+    'Não foi possível registrar a resposta. Tente novamente.'
+  ];
+  if (result && safeMessages.indexOf(result.message) !== -1) {
+    return { kind: 'error', message: result.message };
+  }
   return { kind: 'error', message: 'Não foi possível enviar sua resposta. Tente novamente.' };
 }
 

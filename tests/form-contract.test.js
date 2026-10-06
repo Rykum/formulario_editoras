@@ -90,7 +90,10 @@ test('maps only a confirmed server response to success and never inserts answers
   assert.deepEqual(JSON.parse(JSON.stringify(getSubmissionNotice({ ok: true }))), {
     kind: 'success', message: 'Resposta registrada.'
   });
-  assert.deepEqual(JSON.parse(JSON.stringify(getSubmissionNotice({ ok: false }))), {
+  assert.deepEqual(JSON.parse(JSON.stringify(getSubmissionNotice({ ok: false, message: 'Você já enviou uma resposta recentemente. Aguarde antes de tentar novamente.' }))), {
+    kind: 'error', message: 'Você já enviou uma resposta recentemente. Aguarde antes de tentar novamente.'
+  });
+  assert.deepEqual(JSON.parse(JSON.stringify(getSubmissionNotice({ ok: false, message: '<img src=x>' }))), {
     kind: 'error', message: 'Não foi possível enviar sua resposta. Tente novamente.'
   });
   assert.equal(getSubmissionNotice(null).kind, 'error');

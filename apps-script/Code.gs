@@ -1,6 +1,7 @@
 const SPREADSHEET_NAME = 'Pesquisa sobre IA nas editoras universitárias';
 const RESPONSE_SHEET_NAME = 'Respostas';
 const SPREADSHEET_PROPERTY = 'SPREADSHEET_ID';
+const SUBMISSION_COOLDOWN_SECONDS = 3600;
 
 function setupSurveySpreadsheet() {
   const properties = PropertiesService.getScriptProperties();
@@ -47,19 +48,39 @@ function submitResponse(payload) {
   const validation = validateSubmission(payload || {});
   if (!validation.ok) return { ok: false, message: 'Revise os campos destacados.' };
 
+  const activeUserKey = Session.getTemporaryActiveUserKey();
+  if (typeof activeUserKey !== 'string' || !activeUserKey.trim() || activeUserKey.length > 200) {
+    return { ok: false, message: 'Não foi possível validar o envio. Atualize a página e tente novamente.' };
+  }
+  const cacheKey = 'survey-submission:' + activeUserKey;
+
   const lock = LockService.getScriptLock();
   let lockAcquired = false;
   try {
     lock.waitLock(30000);
     lockAcquired = true;
+    const cache = CacheService.getScriptCache();
+    if (cache.get(cacheKey)) {
+      return { ok: false, message: 'Você já enviou uma resposta recentemente. Aguarde antes de tentar novamente.' };
+    }
+
     const sheet = getResponseSheet();
     sheet.appendRow(buildResponseRow(payload, new Date(), Utilities.getUuid()));
     const count = sheet.getLastRow() - 1;
     if (count > 1) {
-      sheet.getRange(2, 1, count, SURVEY_HEADERS.length).sort([
-        { column: 3, ascending: true },
-        { column: 2, ascending: false }
-      ]);
+      try {
+        sheet.getRange(2, 1, count, SURVEY_HEADERS.length).sort([
+          { column: 3, ascending: true },
+          { column: 2, ascending: false }
+        ]);
+      } catch (sortError) {
+        Logger.log('A resposta foi registrada, mas a ordenação da planilha falhou.');
+      }
+    }
+    try {
+      cache.put(cacheKey, '1', SUBMISSION_COOLDOWN_SECONDS);
+    } catch (cacheError) {
+      Logger.log('A resposta foi registrada, mas o limite temporário de envios não foi aplicado.');
     }
     return { ok: true, message: 'Resposta registrada.' };
   } catch (error) {

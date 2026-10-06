@@ -80,6 +80,13 @@ function createAppsScriptServices() {
   };
   let createCount = 0;
   let uuidCount = 0;
+  const cachedValues = new Map();
+  const scriptCache = {
+    get(key) { return cachedValues.has(key) ? cachedValues.get(key) : null; },
+    put(key, value, expirationInSeconds) { cachedValues.set(key, value); this.lastExpiration = expirationInSeconds; },
+    remove(key) { cachedValues.delete(key); }
+  };
+  const session = { activeUserKey: 'temporary-user-key-1' };
   const logs = [];
   const logger = {
     messages: logs,
@@ -102,6 +109,8 @@ function createAppsScriptServices() {
     properties: scriptProperties,
     htmlService,
     logger,
+    scriptCache,
+    session,
     spreadsheet,
     spreadsheetApp: {
       create(name) { createCount += 1; spreadsheet.name = name; return spreadsheet; },
@@ -125,6 +134,8 @@ function loadAppsScript(files) {
     PropertiesService: { getScriptProperties: () => services.properties },
     SpreadsheetApp: services.spreadsheetApp,
     LockService: { getScriptLock: () => services.lock },
+    CacheService: { getScriptCache: () => services.scriptCache },
+    Session: { getTemporaryActiveUserKey: () => services.session.activeUserKey },
     Utilities: services.utilities,
     HtmlService: services.htmlService,
     Logger: services.logger
@@ -146,6 +157,8 @@ function loadAppsScript(files) {
   context.spreadsheetApp = services.spreadsheetApp;
   context.htmlService = services.htmlService;
   context.logger = services.logger;
+  context.scriptCache = services.scriptCache;
+  context.session = services.session;
   return context;
 }
 

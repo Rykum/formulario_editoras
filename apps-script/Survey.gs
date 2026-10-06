@@ -9,6 +9,17 @@ const SURVEY_OPTIONS = {
   allowIdentification: ['yes', 'no']
 };
 
+const SURVEY_TEXT_LIMITS = {
+  publisher: 200,
+  institution: 200,
+  policyUrl: 2048,
+  otherActivity: 500,
+  otherRestriction: 500,
+  otherBenefit: 500,
+  otherConcern: 500,
+  futurePriority: 2000
+};
+
 const SURVEY_HEADERS = [
   'ID', 'Enviado em', 'Editora', 'Instituição', 'Uso de IA', 'Atividades',
   'Outra atividade', 'Política formal', 'Link da política',
@@ -28,6 +39,19 @@ function addSurveyError(errors, field) {
 
 function isSurveyText(value) {
   return typeof value === 'string';
+}
+
+function validateBoundedText(payload, field, required, errors) {
+  const value = payload[field];
+  if (value == null || value === '') {
+    if (required) addSurveyError(errors, field);
+    return;
+  }
+  if (!isSurveyText(value) || value.length > SURVEY_TEXT_LIMITS[field]) {
+    addSurveyError(errors, field);
+    return;
+  }
+  if (required && !value.trim()) addSurveyError(errors, field);
 }
 
 function validateSingleChoice(data, field, required, errors) {
@@ -85,8 +109,8 @@ function validateSubmission(payload) {
     return { ok: false, errors: ['payload'] };
   }
 
-  ['publisher', 'institution'].forEach(function(field) {
-    if (!isSurveyText(payload[field]) || !payload[field].trim()) addSurveyError(errors, field);
+  Object.keys(SURVEY_TEXT_LIMITS).forEach(function(field) {
+    validateBoundedText(payload, field, field === 'publisher' || field === 'institution', errors);
   });
 
   const usesAI = validateSingleChoice(payload, 'usesAI', true, errors);
@@ -94,9 +118,8 @@ function validateSubmission(payload) {
   const reviewerGuidance = validateSingleChoice(payload, 'reviewerGuidance', true, errors);
   validateSingleChoice(payload, 'allowIdentification', true, errors);
 
-  let activities = [];
+  const activities = validateMultiChoice(payload, 'activities', errors);
   if (usesAI === 'yes' || usesAI === 'testing') {
-    activities = validateMultiChoice(payload, 'activities', errors);
     validateOtherDetail(payload, activities, 'otherActivity', errors);
   }
 
@@ -104,8 +127,8 @@ function validateSubmission(payload) {
     addSurveyError(errors, 'policyUrl');
   }
 
+  const restrictions = validateMultiChoice(payload, 'reviewerRestrictions', errors);
   if (reviewerGuidance === 'restricted') {
-    const restrictions = validateMultiChoice(payload, 'reviewerRestrictions', errors);
     validateOtherDetail(payload, restrictions, 'otherRestriction', errors);
   }
 
@@ -116,12 +139,6 @@ function validateSubmission(payload) {
   const concerns = validateMultiChoice(payload, 'concerns', errors);
   validateExclusiveChoices(concerns, 'concerns', errors);
   validateOtherDetail(payload, concerns, 'otherConcern', errors);
-
-  if (payload.futurePriority != null && !isSurveyText(payload.futurePriority)) {
-    addSurveyError(errors, 'futurePriority');
-  } else if (isSurveyText(payload.futurePriority) && payload.futurePriority.length > 2000) {
-    addSurveyError(errors, 'futurePriority');
-  }
 
   return { ok: errors.length === 0, errors: errors };
 }

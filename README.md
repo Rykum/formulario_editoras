@@ -30,13 +30,13 @@ O formulário divide as dez perguntas em quatro seções: identificação da edi
 3. Em **Quem pode acessar**, escolha a opção mais ampla que a conta permitir. Para receber respostas sem exigir login Google, essa opção precisa permitir acesso anônimo. O acesso anônimo depende das políticas do Google Workspace e das configurações administrativas da conta; se não estiver disponível, não divulgue o link como formulário sem login.
 4. Clique em **Implantar**, conclua a autorização solicitada e copie o URL do app da web. Abra o link em uma janela privada ou em outra conta para confirmar que a página carrega conforme a configuração de acesso escolhida.
 
-> A implantação como proprietário permite que qualquer pessoa com acesso ao link acione o código autorizado a gravar na planilha. Compartilhe o URL somente com o público previsto e revise as permissões da própria planilha na conta proprietária. O formulário não promete anonimato nem define retenção de dados.
+> A implantação como proprietário permite que qualquer pessoa com acesso ao link acione o código autorizado a gravar na planilha. O servidor usa a chave temporária do usuário do Apps Script para limitar uma resposta por chave a cada 60 minutos; essa chave não revela a identidade nem coleta o e-mail. O intervalo reduz envios repetidos, mas não impede automação coordenada ou o uso de várias contas. Compartilhe o URL somente com o público previsto e revise as permissões da própria planilha na conta proprietária. O formulário não promete anonimato nem define retenção de dados.
 
 ## Verificação de um envio
 
 1. Faça um envio de teste identificando o nome da editora como `TESTE — remover depois`.
 2. Aguarde a confirmação exibida pela página e abra a aba **Respostas** da planilha.
-3. Confirme que uma nova linha foi criada e ficou junto às linhas com o mesmo nome de editora, ordenada pela data mais recente.
+3. Confirme que uma nova linha foi criada e ficou junto às linhas com o mesmo nome de editora, ordenada pela data mais recente. Esse envio também confirma que a implantação consegue obter a chave temporária usada para o limite de repetição.
 4. Apague manualmente somente a linha que você identificou como teste.
 
 As respostas anteriores permanecem como linhas independentes. A planilha ordena por editora (A–Z) e, dentro de cada editora, pelos envios mais recentes primeiro.
@@ -57,3 +57,5 @@ Os testes cobrem validação no servidor, serialização segura para o Sheets, a
 - [Apps Script: manifesto do projeto](https://developers.google.com/apps-script/manifest) — opções de runtime e fuso horário.
 - [Apps Script: registro de execução](https://developers.google.com/apps-script/guides/logging) — consulta de mensagens `Logger` e `console` no editor.
 - [Apps Script: comunicação com HTML Service](https://developers.google.com/apps-script/guides/html/communication) — chamadas do navegador para funções do Apps Script.
+- [Apps Script: Session](https://developers.google.com/apps-script/reference/base/session) — chave temporária que identifica um usuário sem revelar sua identidade.
+- [Apps Script: Cache Service](https://developers.google.com/apps-script/reference/cache) — armazenamento temporário usado pelo intervalo de envios.
