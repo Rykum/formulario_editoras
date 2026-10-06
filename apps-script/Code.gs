@@ -12,7 +12,9 @@ function setupSurveySpreadsheet() {
     if (!spreadsheet.getSheetByName(RESPONSE_SHEET_NAME)) {
       throw new Error('A aba de respostas não foi encontrada.');
     }
-    return { spreadsheetId: savedId, url: spreadsheet.getUrl() };
+    const existing = { spreadsheetId: savedId, url: spreadsheet.getUrl() };
+    Logger.log('URL da planilha de respostas: ' + existing.url);
+    return existing;
   }
 
   spreadsheet = SpreadsheetApp.create(SPREADSHEET_NAME);
@@ -23,7 +25,9 @@ function setupSurveySpreadsheet() {
   sheet.getRange(1, 1, 1, SURVEY_HEADERS.length).createFilter();
   properties.setProperty(SPREADSHEET_PROPERTY, spreadsheet.getId());
 
-  return { spreadsheetId: spreadsheet.getId(), url: spreadsheet.getUrl() };
+  const result = { spreadsheetId: spreadsheet.getId(), url: spreadsheet.getUrl() };
+  Logger.log('URL da planilha de respostas: ' + result.url);
+  return result;
 }
 
 function getResponseSheet() {

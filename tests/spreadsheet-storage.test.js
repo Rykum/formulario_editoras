@@ -8,6 +8,7 @@ test('setup creates a named response sheet with a frozen header and filter', () 
   assert.equal(app.spreadsheet.name, 'Pesquisa sobre IA nas editoras universitárias');
   assert.equal(result.spreadsheetId, 'spreadsheet-test-id');
   assert.match(result.url, /^https:\/\/docs\.google\.com\/spreadsheets\//);
+  assert.ok(app.logger.messages.some((message) => message.includes(result.url)));
   assert.equal(app.sheet.getName(), 'Respostas');
   assert.equal(app.sheet.frozenRows, 1);
   assert.equal(app.sheet.filterCreated, true);

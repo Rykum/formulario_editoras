@@ -80,6 +80,11 @@ function createAppsScriptServices() {
   };
   let createCount = 0;
   let uuidCount = 0;
+  const logs = [];
+  const logger = {
+    messages: logs,
+    log(message) { logs.push(String(message)); return this; }
+  };
   const htmlService = {
     lastTemplate: '', lastPartial: '',
     createTemplateFromFile(name) {
@@ -96,6 +101,7 @@ function createAppsScriptServices() {
     lock,
     properties: scriptProperties,
     htmlService,
+    logger,
     spreadsheet,
     spreadsheetApp: {
       create(name) { createCount += 1; spreadsheet.name = name; return spreadsheet; },
@@ -120,7 +126,8 @@ function loadAppsScript(files) {
     SpreadsheetApp: services.spreadsheetApp,
     LockService: { getScriptLock: () => services.lock },
     Utilities: services.utilities,
-    HtmlService: services.htmlService
+    HtmlService: services.htmlService,
+    Logger: services.logger
   });
   for (const file of files) {
     const filePath = path.join(__dirname, '..', 'apps-script', file);
@@ -138,6 +145,7 @@ function loadAppsScript(files) {
   context.spreadsheet = services.spreadsheet;
   context.spreadsheetApp = services.spreadsheetApp;
   context.htmlService = services.htmlService;
+  context.logger = services.logger;
   return context;
 }
 
