@@ -1,0 +1,168 @@
+<script>
+function getConditionalVisibility(answers) {
+  const response = answers || {};
+  return {
+    activities: response.usesAI === 'yes' || response.usesAI === 'testing',
+    policyUrl: response.policyStatus === 'public',
+    reviewerRestrictions: response.reviewerGuidance === 'restricted'
+  };
+}
+
+function normalizeConditionalAnswers(answers) {
+  const normalized = Object.assign({}, answers || {});
+  const visibility = getConditionalVisibility(normalized);
+  if (!visibility.activities) {
+    normalized.activities = [];
+    normalized.otherActivity = '';
+  } else if (!Array.isArray(normalized.activities)) {
+    normalized.activities = [];
+  }
+  if (!visibility.policyUrl) normalized.policyUrl = '';
+  if (!visibility.reviewerRestrictions) {
+    normalized.reviewerRestrictions = [];
+    normalized.otherRestriction = '';
+  } else if (!Array.isArray(normalized.reviewerRestrictions)) {
+    normalized.reviewerRestrictions = [];
+  }
+  if (!Array.isArray(normalized.activities) || normalized.activities.indexOf('other') === -1) normalized.otherActivity = '';
+  if (!Array.isArray(normalized.benefits) || normalized.benefits.indexOf('other') === -1) normalized.otherBenefit = '';
+  if (!Array.isArray(normalized.concerns) || normalized.concerns.indexOf('other') === -1) normalized.otherConcern = '';
+  if (!Array.isArray(normalized.reviewerRestrictions) || normalized.reviewerRestrictions.indexOf('other') === -1) normalized.otherRestriction = '';
+  return normalized;
+}
+
+function getSubmissionNotice(result) {
+  if (result && result.ok === true) {
+    return { kind: 'success', message: 'Resposta registrada.' };
+  }
+  return { kind: 'error', message: 'Não foi possível enviar sua resposta. Tente novamente.' };
+}
+
+function serializeSurveyForm(form) {
+  const formData = new FormData(form);
+  return {
+    publisher: formData.get('publisher') || '',
+    institution: formData.get('institution') || '',
+    usesAI: formData.get('usesAI') || '',
+    activities: formData.getAll('activities'),
+    otherActivity: formData.get('otherActivity') || '',
+    policyStatus: formData.get('policyStatus') || '',
+    policyUrl: formData.get('policyUrl') || '',
+    reviewerGuidance: formData.get('reviewerGuidance') || '',
+    reviewerRestrictions: formData.getAll('reviewerRestrictions'),
+    otherRestriction: formData.get('otherRestriction') || '',
+    benefits: formData.getAll('benefits'),
+    otherBenefit: formData.get('otherBenefit') || '',
+    concerns: formData.getAll('concerns'),
+    otherConcern: formData.get('otherConcern') || '',
+    futurePriority: formData.get('futurePriority') || '',
+    allowIdentification: formData.get('allowIdentification') || '',
+    website: formData.get('website') || ''
+  };
+}
+
+function clearConditionalControls(element) {
+  element.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(function(control) {
+    control.checked = false;
+  });
+  element.querySelectorAll('input[type="text"], input[type="url"], textarea').forEach(function(control) {
+    control.value = '';
+  });
+}
+
+function setConditionalVisibility(element, visible) {
+  if (!element) return;
+  element.hidden = !visible;
+  if (!visible) clearConditionalControls(element);
+}
+
+function updateOtherDetail(form, name, fieldId) {
+  const otherSelected = form.querySelector('input[name="' + name + '"][value="other"]:checked');
+  setConditionalVisibility(form.querySelector('#' + fieldId), Boolean(otherSelected));
+}
+
+function enforceExclusiveSelection(control) {
+  if (!control.checked || (control.name !== 'benefits' && control.name !== 'concerns')) return;
+  const group = control.form.querySelectorAll('input[name="' + control.name + '"]');
+  const isExclusive = control.value === 'none' || control.value === 'unknown';
+  group.forEach(function(peer) {
+    if (peer !== control && (isExclusive || peer.value === 'none' || peer.value === 'unknown')) peer.checked = false;
+  });
+}
+
+function updateSurveyConditionals(form) {
+  const answers = {
+    usesAI: (form.querySelector('input[name="usesAI"]:checked') || {}).value || '',
+    policyStatus: (form.querySelector('input[name="policyStatus"]:checked') || {}).value || '',
+    reviewerGuidance: (form.querySelector('input[name="reviewerGuidance"]:checked') || {}).value || ''
+  };
+  const visibility = getConditionalVisibility(answers);
+  setConditionalVisibility(form.querySelector('#q4'), visibility.activities);
+  setConditionalVisibility(form.querySelector('#policy-url-field'), visibility.policyUrl);
+  setConditionalVisibility(form.querySelector('#reviewer-restrictions'), visibility.reviewerRestrictions);
+  updateOtherDetail(form, 'activities', 'other-activity-field');
+  updateOtherDetail(form, 'reviewerRestrictions', 'other-restriction-field');
+  updateOtherDetail(form, 'benefits', 'other-benefit-field');
+  updateOtherDetail(form, 'concerns', 'other-concern-field');
+}
+
+function showSubmissionNotice(element, result) {
+  const notice = getSubmissionNotice(result);
+  element.textContent = notice.message;
+  element.dataset.kind = notice.kind;
+  return notice;
+}
+
+function initializeSurveyForm() {
+  const form = document.getElementById('survey-form');
+  if (!form) return;
+  const submitButton = form.querySelector('button[type="submit"]');
+  const noticeElement = document.getElementById('form-notice');
+  const buttonLabel = submitButton.querySelector('span');
+  const originalButtonLabel = buttonLabel.textContent;
+
+  form.addEventListener('change', function(event) {
+    enforceExclusiveSelection(event.target);
+    updateSurveyConditionals(form);
+  });
+
+  form.addEventListener('submit', function(event) {
+    event.preventDefault();
+    const payload = normalizeConditionalAnswers(serializeSurveyForm(form));
+    submitButton.disabled = true;
+    form.setAttribute('aria-busy', 'true');
+    buttonLabel.textContent = 'Enviando…';
+    noticeElement.textContent = '';
+    noticeElement.removeAttribute('data-kind');
+
+    google.script.run
+      .withSuccessHandler(function(result) {
+        const notice = showSubmissionNotice(noticeElement, result);
+        if (notice.kind === 'success') {
+          form.reset();
+          updateSurveyConditionals(form);
+        }
+        submitButton.disabled = false;
+        form.removeAttribute('aria-busy');
+        buttonLabel.textContent = originalButtonLabel;
+      })
+      .withFailureHandler(function() {
+        showSubmissionNotice(noticeElement, null);
+        submitButton.disabled = false;
+        form.removeAttribute('aria-busy');
+        buttonLabel.textContent = originalButtonLabel;
+      })
+      .submitResponse(payload);
+  });
+
+  updateSurveyConditionals(form);
+}
+
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeSurveyForm);
+  } else {
+    initializeSurveyForm();
+  }
+}
+</script>

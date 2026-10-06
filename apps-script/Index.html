@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <base target="_top">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <meta name="description" content="Pesquisa sobre o uso de inteligência artificial generativa nas editoras universitárias.">
+    <title>Pesquisa sobre IA nas editoras universitárias</title>
+    <style>
+      <?!= include('Styles'); ?>
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="wordmark" href="#top" aria-label="Pesquisa editorial, início">
+        <span class="wordmark-mark" aria-hidden="true">e</span>
+        <span>Pesquisa editorial</span>
+      </a>
+      <span class="header-context">Editoras universitárias</span>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> Pesquisa institucional</p>
+          <h1 id="page-title">Inteligência artificial<br><em>nas editoras universitárias</em></h1>
+          <p class="hero-description">Queremos conhecer práticas, orientações e percepções sobre a IA generativa no trabalho editorial. Sua resposta ajuda a compor um panorama do setor.</p>
+          <div class="hero-meta"><span>10 perguntas essenciais</span><span class="meta-divider" aria-hidden="true"></span><span>Formulário institucional</span></div>
+        </div>
+        <div class="hero-note">
+          <span class="note-index">FORMULÁRIO · EDITORAS UNIVERSITÁRIAS</span>
+          <p>Uma pesquisa sobre escolhas editoriais em transformação.</p>
+          <span class="note-rule" aria-hidden="true"></span>
+        </div>
+      </section>
+
+      <div class="content-layout">
+        <aside class="form-aside" aria-label="Informações sobre a pesquisa">
+          <p class="aside-kicker">Sobre este formulário</p>
+          <p>As respostas serão registradas em uma planilha Google para organização e análise da pesquisa.</p>
+          <div class="aside-divider" aria-hidden="true"></div>
+          <p class="aside-small">Preencha uma resposta representativa da editora. Os campos marcados como obrigatórios precisam ser respondidos.</p>
+        </aside>
+
+        <form id="survey-form" class="survey-form">
+          <section class="form-section" aria-labelledby="section-publisher">
+            <div class="section-heading">
+              <span class="section-number" aria-hidden="true">01</span>
+              <h2 id="section-publisher">Identificação da editora</h2>
+            </div>
+
+            <div class="question text-question" id="q1">
+              <label class="question-label" for="publisher">01 <span>Qual é o nome da editora?</span> <span class="required-tag">Obrigatório</span></label>
+              <input id="publisher" name="publisher" type="text" autocomplete="organization" maxlength="200" required>
+            </div>
+
+            <div class="question text-question" id="q2">
+              <label class="question-label" for="institution">02 <span>A qual instituição a editora está vinculada?</span> <span class="required-tag">Obrigatório</span></label>
+              <input id="institution" name="institution" type="text" autocomplete="organization" maxlength="200" required>
+            </div>
+          </section>
+
+          <section class="form-section" aria-labelledby="section-practices">
+            <div class="section-heading">
+              <span class="section-number" aria-hidden="true">02</span>
+              <h2 id="section-practices">Uso e orientações sobre IA</h2>
+            </div>
+
+            <fieldset class="question choice-question" id="q3">
+              <legend class="question-label"><span class="question-number">03</span> A editora utiliza ou está testando IA generativa em atividades editoriais? <span class="required-tag">Obrigatório</span></legend>
+              <div class="choice-list">
+                <label class="choice"><input type="radio" id="uses-ai-yes" name="usesAI" value="yes" required><span>Sim, já utiliza</span></label>
+                <label class="choice"><input type="radio" id="uses-ai-testing" name="usesAI" value="testing" required><span>Está em fase de testes</span></label>
+                <label class="choice"><input type="radio" id="uses-ai-no" name="usesAI" value="no" required><span>Não utiliza nem testa</span></label>
+                <label class="choice"><input type="radio" id="uses-ai-unknown" name="usesAI" value="unknown" required><span>Não sei informar</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="question choice-question" id="q4" hidden>
+              <legend class="question-label"><span class="question-number">04</span> Em quais atividades editoriais a IA generativa é utilizada ou testada?</legend>
+              <p class="question-hint">Selecione todas as opções aplicáveis.</p>
+              <div class="choice-list choice-list-two-column">
+                <label class="choice"><input type="checkbox" id="activity-writing" name="activities" value="writing"><span>Elaboração de textos</span></label>
+                <label class="choice"><input type="checkbox" id="activity-revision" name="activities" value="revision"><span>Revisão de textos</span></label>
+                <label class="choice"><input type="checkbox" id="activity-translation" name="activities" value="translation"><span>Tradução</span></label>
+                <label class="choice"><input type="checkbox" id="activity-metadata" name="activities" value="summaries-metadata"><span>Resumos ou metadados</span></label>
+                <label class="choice"><input type="checkbox" id="activity-images" name="activities" value="images-layout"><span>Produção de imagens ou diagramação</span></label>
+                <label class="choice"><input type="checkbox" id="activity-accessibility" name="activities" value="accessibility"><span>Acessibilidade</span></label>
+                <label class="choice"><input type="checkbox" id="activity-originality" name="activities" value="originality"><span>Verificação de originalidade</span></label>
+                <label class="choice"><input type="checkbox" id="activity-editorial-support" name="activities" value="editorial-support"><span>Apoio editorial</span></label>
+                <label class="choice"><input type="checkbox" id="activity-communication" name="activities" value="communication"><span>Comunicação ou divulgação</span></label>
+                <label class="choice"><input type="checkbox" id="activity-other" name="activities" value="other"><span>Outra atividade</span></label>
+              </div>
+              <div class="conditional-field" id="other-activity-field" hidden>
+                <label for="other-activity">Qual outra atividade?</label>
+                <input id="other-activity" name="otherActivity" type="text" maxlength="500">
+              </div>
+            </fieldset>
+
+            <fieldset class="question choice-question" id="q5">
+              <legend class="question-label"><span class="question-number">05</span> Qual é a situação da política ou orientação formal da editora sobre o uso de IA? <span class="required-tag">Obrigatório</span></legend>
+              <div class="choice-list">
+                <label class="choice"><input type="radio" id="policy-public" name="policyStatus" value="public" required><span>Adotada e pública</span></label>
+                <label class="choice"><input type="radio" id="policy-private" name="policyStatus" value="private" required><span>Adotada, mas não pública</span></label>
+                <label class="choice"><input type="radio" id="policy-developing" name="policyStatus" value="developing" required><span>Em elaboração</span></label>
+                <label class="choice"><input type="radio" id="policy-none" name="policyStatus" value="none" required><span>Não existe</span></label>
+                <label class="choice"><input type="radio" id="policy-unknown" name="policyStatus" value="unknown" required><span>Não sei informar</span></label>
+              </div>
+              <div class="conditional-field" id="policy-url-field" hidden>
+                <label for="policy-url">Link público da política <span class="optional-tag">Opcional</span></label>
+                <input id="policy-url" name="policyUrl" type="url" inputmode="url" placeholder="https://" maxlength="2048">
+              </div>
+            </fieldset>
+
+            <fieldset class="question choice-question" id="q6">
+              <legend class="question-label"><span class="question-number">06</span> Qual orientação se aplica ao uso de IA generativa por pareceristas? <span class="required-tag">Obrigatório</span></legend>
+              <div class="choice-list">
+                <label class="choice"><input type="radio" id="review-prohibited" name="reviewerGuidance" value="prohibited" required><span>É proibido</span></label>
+                <label class="choice"><input type="radio" id="review-restricted" name="reviewerGuidance" value="restricted" required><span>É permitido com restrições</span></label>
+                <label class="choice"><input type="radio" id="review-unrestricted" name="reviewerGuidance" value="unrestricted" required><span>É permitido sem restrições específicas</span></label>
+                <label class="choice"><input type="radio" id="review-none" name="reviewerGuidance" value="none" required><span>Não há orientação</span></label>
+                <label class="choice"><input type="radio" id="review-unknown" name="reviewerGuidance" value="unknown" required><span>Não sei informar</span></label>
+              </div>
+              <fieldset class="conditional-field nested-choice" id="reviewer-restrictions" hidden>
+                <legend>Quais restrições se aplicam?</legend>
+                <div class="choice-list">
+                  <label class="choice"><input type="checkbox" id="restriction-declaration" name="reviewerRestrictions" value="declaration"><span>Declarar o uso de IA</span></label>
+                  <label class="choice"><input type="checkbox" id="restriction-confidentiality" name="reviewerRestrictions" value="confidentiality"><span>Não inserir originais ou informações confidenciais em ferramentas públicas</span></label>
+                  <label class="choice"><input type="checkbox" id="restriction-other" name="reviewerRestrictions" value="other"><span>Outra restrição</span></label>
+                </div>
+                <div class="conditional-field nested-detail" id="other-restriction-field" hidden>
+                  <label for="other-restriction">Qual outra restrição?</label>
+                  <input id="other-restriction" name="otherRestriction" type="text" maxlength="500">
+                </div>
+              </fieldset>
+            </fieldset>
+          </section>
+
+          <section class="form-section" aria-labelledby="section-perceptions">
+            <div class="section-heading">
+              <span class="section-number" aria-hidden="true">03</span>
+              <h2 id="section-perceptions">Percepções e prioridades</h2>
+            </div>
+
+            <fieldset class="question choice-question" id="q7">
+              <legend class="question-label"><span class="question-number">07</span> Quais benefícios a editora percebe ou espera obter com o uso de IA?</legend>
+              <p class="question-hint">Selecione todas as opções aplicáveis. “Nenhum” e “Não sei informar” são opções exclusivas.</p>
+              <div class="choice-list choice-list-two-column">
+                <label class="choice"><input type="checkbox" id="benefit-efficiency" name="benefits" value="efficiency"><span>Agilidade e redução de tarefas repetitivas</span></label>
+                <label class="choice"><input type="checkbox" id="benefit-revision" name="benefits" value="revision"><span>Apoio à revisão</span></label>
+                <label class="choice"><input type="checkbox" id="benefit-translation" name="benefits" value="translation"><span>Tradução</span></label>
+                <label class="choice"><input type="checkbox" id="benefit-accessibility" name="benefits" value="accessibility"><span>Acessibilidade</span></label>
+                <label class="choice"><input type="checkbox" id="benefit-dissemination" name="benefits" value="dissemination"><span>Divulgação</span></label>
+                <label class="choice"><input type="checkbox" id="benefit-cost" name="benefits" value="cost-reduction"><span>Redução de custos</span></label>
+                <label class="choice"><input type="checkbox" id="benefit-other" name="benefits" value="other"><span>Outro benefício</span></label>
+                <label class="choice"><input type="checkbox" id="benefit-none" name="benefits" value="none"><span>Nenhum</span></label>
+                <label class="choice"><input type="checkbox" id="benefit-unknown" name="benefits" value="unknown"><span>Não sei informar</span></label>
+              </div>
+              <div class="conditional-field" id="other-benefit-field" hidden>
+                <label for="other-benefit">Qual outro benefício?</label>
+                <input id="other-benefit" name="otherBenefit" type="text" maxlength="500">
+              </div>
+            </fieldset>
+
+            <fieldset class="question choice-question" id="q8">
+              <legend class="question-label"><span class="question-number">08</span> Quais são as principais preocupações da editora em relação ao uso de IA?</legend>
+              <p class="question-hint">Selecione todas as opções aplicáveis. “Nenhuma” e “Não sei informar” são opções exclusivas.</p>
+              <div class="choice-list choice-list-two-column">
+                <label class="choice"><input type="checkbox" id="concern-copyright" name="concerns" value="copyright-plagiarism"><span>Direitos autorais ou plágio</span></label>
+                <label class="choice"><input type="checkbox" id="concern-errors" name="concerns" value="errors"><span>Erros ou informações falsas</span></label>
+                <label class="choice"><input type="checkbox" id="concern-confidentiality" name="concerns" value="confidentiality-data"><span>Confidencialidade ou proteção de dados</span></label>
+                <label class="choice"><input type="checkbox" id="concern-authorship" name="concerns" value="authorship-quality"><span>Autoria ou qualidade editorial</span></label>
+                <label class="choice"><input type="checkbox" id="concern-dependence" name="concerns" value="technology-dependence"><span>Dependência tecnológica</span></label>
+                <label class="choice"><input type="checkbox" id="concern-undisclosed" name="concerns" value="undisclosed-use"><span>Uso de IA não declarado</span></label>
+                <label class="choice"><input type="checkbox" id="concern-other" name="concerns" value="other"><span>Outra preocupação</span></label>
+                <label class="choice"><input type="checkbox" id="concern-none" name="concerns" value="none"><span>Nenhuma</span></label>
+                <label class="choice"><input type="checkbox" id="concern-unknown" name="concerns" value="unknown"><span>Não sei informar</span></label>
+              </div>
+              <div class="conditional-field" id="other-concern-field" hidden>
+                <label for="other-concern">Qual outra preocupação?</label>
+                <input id="other-concern" name="otherConcern" type="text" maxlength="500">
+              </div>
+            </fieldset>
+
+            <div class="question text-question" id="q9">
+              <label class="question-label" for="future-priority"><span class="question-number">09</span> Na sua avaliação, qual deve ser a principal prioridade das editoras universitárias diante das mudanças que a IA pode trazer ao trabalho editorial?</label>
+              <p class="question-hint">Resposta aberta · até 2.000 caracteres</p>
+              <textarea id="future-priority" name="futurePriority" rows="5" maxlength="2000" placeholder="Compartilhe a prioridade que considera mais importante…"></textarea>
+            </div>
+          </section>
+
+          <section class="form-section final-section" aria-labelledby="section-identification">
+            <div class="section-heading">
+              <span class="section-number" aria-hidden="true">04</span>
+              <h2 id="section-identification">Identificação em publicações</h2>
+            </div>
+            <fieldset class="question choice-question" id="q10">
+              <legend class="question-label"><span class="question-number">10</span> A editora autoriza que sua instituição seja identificada em publicações resultantes desta pesquisa? <span class="required-tag">Obrigatório</span></legend>
+              <div class="choice-list choice-list-inline">
+                <label class="choice"><input type="radio" id="identification-yes" name="allowIdentification" value="yes" required><span>Sim</span></label>
+                <label class="choice"><input type="radio" id="identification-no" name="allowIdentification" value="no" required><span>Não</span></label>
+              </div>
+            </fieldset>
+          </section>
+
+          <div class="submit-area">
+            <p class="submit-note">As respostas serão organizadas por editora para análise da pesquisa.</p>
+            <button class="submit-button" type="submit"><span>Enviar respostas</span><span class="button-arrow" aria-hidden="true">↗</span></button>
+            <p id="form-notice" class="form-notice" role="status" aria-live="polite" aria-atomic="true"></p>
+          </div>
+
+          <div class="honeypot" aria-hidden="true">
+            <label for="website">Deixe este campo vazio</label>
+            <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <span>Pesquisa sobre IA generativa e trabalho editorial</span>
+      <span>Editoras universitárias</span>
+    </footer>
+    <?!= include('Client'); ?>
+  </body>
+</html>
