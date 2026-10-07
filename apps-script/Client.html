@@ -48,6 +48,12 @@ function getSubmissionNotice(result) {
   return { kind: 'error', message: 'Não foi possível enviar sua resposta. Tente novamente.' };
 }
 
+function formatCharacterCount(value, maxLength) {
+  const count = String(value || '').length;
+  const limit = Number(maxLength) || 0;
+  return count.toLocaleString('pt-BR') + ' / ' + limit.toLocaleString('pt-BR') + ' caracteres';
+}
+
 function serializeSurveyForm(form) {
   const formData = new FormData(form);
   return {
@@ -130,6 +136,17 @@ function initializeSurveyForm() {
   const noticeElement = document.getElementById('form-notice');
   const buttonLabel = submitButton.querySelector('span');
   const originalButtonLabel = buttonLabel.textContent;
+  const priorityField = form.querySelector('#future-priority');
+  const priorityCounter = form.querySelector('#future-priority-counter');
+  const updatePriorityCounter = function() {
+    if (!priorityField || !priorityCounter) return;
+    priorityCounter.textContent = formatCharacterCount(priorityField.value, priorityField.maxLength);
+  };
+
+  if (priorityField && priorityCounter) {
+    priorityField.addEventListener('input', updatePriorityCounter);
+    updatePriorityCounter();
+  }
 
   form.addEventListener('change', function(event) {
     enforceExclusiveSelection(event.target);
@@ -151,6 +168,7 @@ function initializeSurveyForm() {
         if (notice.kind === 'success') {
           form.reset();
           updateSurveyConditionals(form);
+          updatePriorityCounter();
         }
         submitButton.disabled = false;
         form.removeAttribute('aria-busy');

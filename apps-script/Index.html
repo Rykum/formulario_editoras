@@ -185,8 +185,11 @@
 
             <div class="question text-question" id="q9">
               <label class="question-label" for="future-priority"><span class="question-number">09</span> Na sua avaliação, qual deve ser a principal prioridade das editoras universitárias diante das mudanças que a IA pode trazer ao trabalho editorial?</label>
-              <p class="question-hint">Resposta aberta · até 2.000 caracteres</p>
-              <textarea id="future-priority" name="futurePriority" rows="5" maxlength="2000" placeholder="Compartilhe a prioridade que considera mais importante…"></textarea>
+              <div class="textarea-meta">
+                <p class="question-hint" id="future-priority-hint">Resposta aberta · até 2.000 caracteres</p>
+                <span class="character-count" id="future-priority-counter" aria-live="off">0 / 2.000 caracteres</span>
+              </div>
+              <textarea id="future-priority" name="futurePriority" rows="5" maxlength="2000" aria-describedby="future-priority-hint future-priority-counter" placeholder="Compartilhe a prioridade que considera mais importante…"></textarea>
             </div>
           </section>
 

@@ -39,20 +39,26 @@ test('shows the four survey sections and exactly ten question groups', () => {
   }
 });
 
-test('uses a contemporary visual system with a highlighted hero and card-based form sections', () => {
+test('uses a pastel visual system with interactive choices and reduced-motion support', () => {
   const styles = readSurveySources()['Styles.html'];
   const root = styles.match(/:root\s*{([\s\S]*?)}/)?.[1] || '';
   const hero = styles.match(/\.hero\s*{([\s\S]*?)}/)?.[1] || '';
-  const formSection = styles.match(/\.form-section\s*{([\s\S]*?)}/)?.[1] || '';
 
-  assert.match(root, /--forest:\s*#[0-9a-f]{6}/i);
-  assert.match(root, /--mint:\s*#[0-9a-f]{6}/i);
+  assert.match(root, /--lavender:\s*#[0-9a-f]{6}/i);
+  assert.match(root, /--sage:\s*#[0-9a-f]{6}/i);
+  assert.match(root, /--peach:\s*#[0-9a-f]{6}/i);
   assert.match(hero, /background:/);
-  assert.match(hero, /border-radius:\s*\d+px/);
-  assert.match(formSection, /background:\s*var\(--surface\)/);
-  assert.match(formSection, /border-radius:\s*\d+px/);
+  assert.match(styles, /\.choice:has\(input:checked\)/);
+  assert.match(styles, /:focus-visible/);
   assert.match(styles, /@media\s*\(max-width:\s*860px\)/);
   assert.match(styles, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
+});
+
+test('shows an accessible character count for the open response', () => {
+  const { 'Index.html': page } = readSurveySources();
+  assert.match(page, /id="future-priority-hint"/);
+  assert.match(page, /id="future-priority-counter"[^>]*aria-live="off"/);
+  assert.match(page, /aria-describedby="future-priority-hint future-priority-counter"/);
 });
 
 test('choice groups use visible legends and labels associated with their controls', () => {
@@ -98,6 +104,13 @@ test('normalizes hidden conditional answers without mutating the form payload', 
   assert.equal(normalized.otherRestriction, '');
   assert.equal(original.activities[0], 'translation');
   assert.equal(original.policyUrl, 'https://example.org/policy');
+});
+
+test('formats the open-response character count for Brazilian Portuguese', () => {
+  const { 'Client.html': client } = readSurveySources();
+  const { formatCharacterCount } = loadClientHelpers(client);
+  assert.equal(formatCharacterCount('', 2000), '0 / 2.000 caracteres');
+  assert.equal(formatCharacterCount('Edição', 2000), '6 / 2.000 caracteres');
 });
 
 test('maps only a confirmed server response to success and never inserts answers as HTML', () => {
