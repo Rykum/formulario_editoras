@@ -13,6 +13,26 @@ function loadClientHelpers() {
   return vm.createContext({});
 }
 
+function cssVariable(name) {
+  const rootTokens = styles.match(/:root\s*{([\s\S]*?)}/)?.[1] || '';
+  return rootTokens.match(new RegExp(`--${name}:\\s*(#[0-9a-f]{6})`, 'i'))?.[1] || '';
+}
+
+function cssRule(selector) {
+  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
+  return styles.match(new RegExp(`(?:^|\\n)${escaped}\\s*{([^}]*)}`, 'i'))?.[1] || '';
+}
+
+function contrastRatio(foreground, background) {
+  const luminance = (hex) => {
+    const channels = hex.slice(1).match(/../g).map((channel) => Number.parseInt(channel, 16) / 255);
+    const linear = channels.map((channel) => channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4);
+    return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
+  };
+  const values = [luminance(foreground), luminance(background)].sort((a, b) => b - a);
+  return (values[0] + 0.05) / (values[1] + 0.05);
+}
+
 test('shows the four survey sections and exactly ten question groups in order', () => {
   for (const heading of [
     'Identificação da editora',
@@ -27,12 +47,51 @@ test('shows the four survey sections and exactly ten question groups in order', 
   assert.deepEqual(numbers, ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']);
 });
 
-test('uses a light UTFPR visual system with interactive choices and reduced-motion support', () => {
-  const rootTokens = styles.match(/:root\s*{([\s\S]*?)}/)?.[1] || '';
+test('uses UTFPR black, yellow, and white with readable text contrast', () => {
+  assert.equal(cssVariable('utfpr-black').toUpperCase(), '#333333');
+  assert.equal(cssVariable('utfpr-yellow').toUpperCase(), '#FFC814');
+  assert.equal(cssVariable('surface').toUpperCase(), '#FFFFFF');
+  assert.equal(cssVariable('focus-ring').toUpperCase(), '#333333');
+  assert.ok(contrastRatio(cssVariable('utfpr-black'), cssVariable('surface')) >= 4.5);
+  assert.ok(contrastRatio(cssVariable('utfpr-black'), cssVariable('utfpr-yellow')) >= 4.5);
+  assert.ok(contrastRatio(cssVariable('utfpr-yellow'), cssVariable('utfpr-black')) >= 4.5);
+  assert.ok(contrastRatio(cssVariable('focus-ring'), cssVariable('surface')) >= 4.5);
+  assert.match(page, /<meta name="theme-color" content="#FFC814">/i);
+});
 
-  assert.match(rootTokens, /--utfpr-green:\s*#[0-9a-f]{6}/i);
-  assert.match(rootTokens, /--utfpr-gold:\s*#[0-9a-f]{6}/i);
-  assert.match(rootTokens, /--surface:\s*#(?:fff|ffffff)\b/i);
+test('styles the research team as a horizontal UTFPR badge', () => {
+  const badge = cssRule('.research-team');
+  const names = cssRule('.research-team strong');
+  const roles = cssRule('.research-team p span');
+
+  assert.match(badge, /display:\s*flex/);
+  assert.match(badge, /background:\s*var\(--utfpr-black\)/);
+  assert.match(badge, /border-left:\s*4px solid var\(--utfpr-yellow\)/);
+  assert.match(names, /color:\s*#fff/i);
+  assert.match(roles, /color:\s*var\(--utfpr-yellow\)/);
+});
+
+test('styles the institutional tag as a softly raised white rectangle', () => {
+  const label = cssRule('.header-label');
+
+  assert.match(label, /border-radius:\s*1[0-2]px/);
+  assert.match(label, /background:\s*var\(--surface\)/);
+  assert.match(label, /box-shadow:/);
+  assert.match(label, /color:\s*var\(--utfpr-black\)/);
+});
+
+test('places a thin yellow outline just behind the white survey form', () => {
+  const form = cssRule('.form-shell');
+  const outline = cssRule('.form-shell::before');
+
+  assert.match(form, /isolation:\s*isolate/);
+  assert.match(outline, /position:\s*absolute/);
+  assert.match(outline, /inset:\s*\d+px\s+-\d+px\s+-\d+px\s+\d+px/);
+  assert.match(outline, /border:\s*1px solid var\(--utfpr-yellow\)/);
+  assert.match(outline, /pointer-events:\s*none/);
+});
+
+test('keeps interactive choices, keyboard focus, responsive layout, and reduced-motion support', () => {
   assert.match(styles, /\.choice:has\(input:checked\)/);
   assert.match(styles, /:focus-visible/);
   assert.match(styles, /@media\s*\(max-width:/);

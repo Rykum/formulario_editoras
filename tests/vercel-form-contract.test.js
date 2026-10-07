@@ -31,12 +31,13 @@ test('uses accessible choice grouping and does not depend on Apps Script', () =>
   assert.match(html, /<script\b[^>]*src="(?:\/|\.\/)client\.js"/);
 });
 
-test('uses the official local UTFPR mark on a light, responsive surface', () => {
+test('uses the official local UTFPR mark on the responsive black, yellow, and white palette', () => {
   const logoPath = path.join(root, 'public', 'utfpr-logo.png');
   const logo = fs.readFileSync(logoPath);
   assert.deepEqual([...logo.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
   assert.match(html, /<img\b[^>]*class="brand-logo"[^>]*src="\/public\/utfpr-logo\.png"[^>]*alt="UTFPR/);
-  assert.match(styles, /--utfpr-green:\s*#[0-9a-f]{6}/i);
+  assert.match(styles, /--utfpr-black:\s*#[0-9a-f]{6}/i);
+  assert.match(styles, /--utfpr-yellow:\s*#[0-9a-f]{6}/i);
   assert.match(styles, /@media\s*\(max-width:/);
   assert.match(styles, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
 });
