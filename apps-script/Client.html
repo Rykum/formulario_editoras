@@ -25,8 +25,6 @@ function normalizeConditionalAnswers(answers) {
     normalized.reviewerRestrictions = [];
   }
   if (!Array.isArray(normalized.activities) || normalized.activities.indexOf('other') === -1) normalized.otherActivity = '';
-  if (!Array.isArray(normalized.benefits) || normalized.benefits.indexOf('other') === -1) normalized.otherBenefit = '';
-  if (!Array.isArray(normalized.concerns) || normalized.concerns.indexOf('other') === -1) normalized.otherConcern = '';
   if (!Array.isArray(normalized.reviewerRestrictions) || normalized.reviewerRestrictions.indexOf('other') === -1) normalized.otherRestriction = '';
   return normalized;
 }
@@ -60,6 +58,7 @@ function serializeSurveyForm(form) {
     publisher: formData.get('publisher') || '',
     institution: formData.get('institution') || '',
     usesAI: formData.get('usesAI') || '',
+    toolsUsed: formData.get('toolsUsed') || '',
     activities: formData.getAll('activities'),
     otherActivity: formData.get('otherActivity') || '',
     policyStatus: formData.get('policyStatus') || '',
@@ -113,13 +112,22 @@ function updateSurveyConditionals(form) {
     reviewerGuidance: (form.querySelector('input[name="reviewerGuidance"]:checked') || {}).value || ''
   };
   const visibility = getConditionalVisibility(answers);
-  setConditionalVisibility(form.querySelector('#q4'), visibility.activities);
+  setConditionalVisibility(form.querySelector('#q5'), visibility.activities);
   setConditionalVisibility(form.querySelector('#policy-url-field'), visibility.policyUrl);
   setConditionalVisibility(form.querySelector('#reviewer-restrictions'), visibility.reviewerRestrictions);
   updateOtherDetail(form, 'activities', 'other-activity-field');
   updateOtherDetail(form, 'reviewerRestrictions', 'other-restriction-field');
-  updateOtherDetail(form, 'benefits', 'other-benefit-field');
-  updateOtherDetail(form, 'concerns', 'other-concern-field');
+}
+
+function renumberVisibleQuestions(form) {
+  let number = 0;
+  form.querySelectorAll('.question[id^="q"]').forEach(function(question) {
+    if (question.hidden) return;
+    const numberElement = question.querySelector('.question-number');
+    if (!numberElement) return;
+    number += 1;
+    numberElement.textContent = String(number).padStart(2, '0');
+  });
 }
 
 function showSubmissionNotice(element, result) {
@@ -151,6 +159,7 @@ function initializeSurveyForm() {
   form.addEventListener('change', function(event) {
     enforceExclusiveSelection(event.target);
     updateSurveyConditionals(form);
+    renumberVisibleQuestions(form);
   });
 
   form.addEventListener('submit', function(event) {
@@ -168,6 +177,7 @@ function initializeSurveyForm() {
         if (notice.kind === 'success') {
           form.reset();
           updateSurveyConditionals(form);
+          renumberVisibleQuestions(form);
           updatePriorityCounter();
         }
         submitButton.disabled = false;
@@ -184,6 +194,7 @@ function initializeSurveyForm() {
   });
 
   updateSurveyConditionals(form);
+  renumberVisibleQuestions(form);
 }
 
 if (typeof document !== 'undefined') {

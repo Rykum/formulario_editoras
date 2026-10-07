@@ -10,9 +10,11 @@ function setupSurveySpreadsheet() {
 
   if (savedId) {
     spreadsheet = SpreadsheetApp.openById(savedId);
-    if (!spreadsheet.getSheetByName(RESPONSE_SHEET_NAME)) {
+    const existingSheet = spreadsheet.getSheetByName(RESPONSE_SHEET_NAME);
+    if (!existingSheet) {
       throw new Error('A aba de respostas não foi encontrada.');
     }
+    ensureSurveyHeaders(existingSheet);
     const existing = { spreadsheetId: savedId, url: spreadsheet.getUrl() };
     Logger.log('URL da planilha de respostas: ' + existing.url);
     return existing;
@@ -37,7 +39,29 @@ function getResponseSheet() {
   const spreadsheet = SpreadsheetApp.openById(spreadsheetId);
   const sheet = spreadsheet.getSheetByName(RESPONSE_SHEET_NAME);
   if (!sheet) throw new Error('A aba de respostas não foi encontrada.');
+  ensureSurveyHeaders(sheet);
   return sheet;
+}
+
+function ensureSurveyHeaders(sheet) {
+  const lastColumn = sheet.getLastColumn();
+  const existingHeaders = lastColumn > 0
+    ? sheet.getRange(1, 1, 1, lastColumn).getValues()[0]
+    : [];
+  const missingHeaders = SURVEY_HEADERS.filter(function(header) {
+    return existingHeaders.indexOf(header) === -1;
+  });
+
+  if (missingHeaders.length > 0) {
+    sheet.getRange(1, lastColumn + 1, 1, missingHeaders.length).setValues([missingHeaders]);
+  }
+
+  const targetColumns = Math.max(lastColumn + missingHeaders.length, SURVEY_HEADERS.length);
+  const currentFilter = sheet.getFilter();
+  if (!currentFilter || currentFilter.getRange().getNumColumns() < targetColumns) {
+    if (currentFilter) currentFilter.remove();
+    sheet.getRange(1, 1, Math.max(sheet.getLastRow(), 1), targetColumns).createFilter();
+  }
 }
 
 function submitResponse(payload) {

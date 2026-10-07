@@ -1,6 +1,6 @@
 # Pesquisa sobre IA nas editoras universitárias
 
-Landing page responsiva para uma pesquisa institucional sobre o uso de inteligência artificial generativa em editoras universitárias. O formulário reúne dez perguntas, valida as respostas no servidor e registra cada envio em uma nova linha de uma planilha Google, agrupando as respostas pelo nome da editora.
+Landing page responsiva para uma pesquisa institucional sobre o uso de inteligência artificial generativa em editoras universitárias. O formulário reúne onze perguntas, valida as respostas no servidor e registra cada envio em uma nova linha de uma planilha Google, agrupando as respostas pelo nome da editora.
 
 ## Arquivos do Apps Script
 
@@ -13,14 +13,18 @@ Landing page responsiva para uma pesquisa institucional sobre o uso de inteligê
 | `Client.html` | HTML |
 | `appsscript.json` | Manifesto do projeto |
 
-O formulário divide as dez perguntas em quatro seções: identificação da editora; uso e orientações sobre IA; percepções e prioridades; e autorização de identificação em publicações. Campos condicionais aparecem conforme as respostas, e respostas abertas não são inseridas no HTML da página.
+O formulário reúne as onze perguntas em quatro seções: identificação da editora; uso e orientações sobre IA; percepções e prioridades; e autorização de identificação em publicações. A pergunta 4 registra os nomes das ferramentas utilizadas ou avaliadas. As perguntas sobre benefícios e preocupações combinam seleções com campos opcionais de texto. Campos condicionais aparecem conforme as respostas.
+
+## Marca e tipografia
+
+O cabeçalho usa a versão horizontal colorida da marca, servida pela [página oficial da UTFPR](https://www.utfpr.edu.br/comunicacao/design/marca-da-utfpr/). A pilha tipográfica prioriza Futura MD BT, indicada no [manual de identidade visual da UTFPR](https://www.utfpr.edu.br/comunicacao/design/manual-de-uso-da-identidade-visual-da-utfpr/), e usa fontes sans-serif alternativas quando ela não está disponível.
 
 ## Configurar a planilha e o formulário
 
 1. Acesse [script.google.com](https://script.google.com/) com a conta Google que será proprietária da pesquisa e crie um **Novo projeto** independente.
 2. No editor, crie os arquivos `Code.gs` e `Survey.gs` como arquivos de script. Crie `Index.html`, `Styles.html` e `Client.html` como arquivos HTML. Copie o conteúdo de cada arquivo local para o arquivo homônimo no projeto.
 3. Para configurar o manifesto, abra **Configurações do projeto**, marque **Mostrar o arquivo de manifesto `appsscript.json` no editor** e substitua o conteúdo pelo arquivo `apps-script/appsscript.json` deste repositório. Salve o projeto. Ele usa o runtime V8 e o fuso `America/Sao_Paulo`; os escopos de acesso à planilha são detectados pelo Apps Script a partir do código.
-4. No seletor de funções, escolha `setupSurveySpreadsheet()` e clique em **Executar**. Na primeira execução, revise e autorize as permissões solicitadas. A função cria a planilha **Pesquisa sobre IA nas editoras universitárias**, com uma aba **Respostas**, cabeçalho congelado e filtro. A execução também retorna e registra a URL da planilha.
+4. No seletor de funções, escolha `setupSurveySpreadsheet()` e clique em **Executar**. Na primeira execução, revise e autorize as permissões solicitadas. A função cria a planilha **Pesquisa sobre IA nas editoras universitárias**, com uma aba **Respostas**, cabeçalho congelado e filtro. A execução também retorna e registra a URL da planilha. Se a planilha já existir, a função acrescenta a nova coluna de ferramentas ao final, preservando a posição dos dados antigos.
 5. Abra **Registro de execução** no editor após rodar a função e copie a linha `URL da planilha de respostas: ...`. Guarde esse link para analisar as respostas; não é necessário inserir o ID da planilha no código do navegador.
 
 ## Implantar como aplicativo da web

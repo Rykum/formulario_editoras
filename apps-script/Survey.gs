@@ -12,6 +12,7 @@ const SURVEY_OPTIONS = {
 const SURVEY_TEXT_LIMITS = {
   publisher: 200,
   institution: 200,
+  toolsUsed: 1000,
   policyUrl: 2048,
   otherActivity: 500,
   otherRestriction: 500,
@@ -25,7 +26,8 @@ const SURVEY_HEADERS = [
   'Outra atividade', 'Política formal', 'Link da política',
   'Orientação para pareceristas', 'Restrições para pareceristas',
   'Outra restrição', 'Benefícios', 'Outro benefício', 'Preocupações',
-  'Outra preocupação', 'Prioridade futura', 'Autoriza identificação'
+  'Outra preocupação', 'Prioridade futura', 'Autoriza identificação',
+  'Ferramentas de IA utilizadas ou avaliadas'
 ];
 
 function sanitizeCellText(value) {
@@ -134,11 +136,9 @@ function validateSubmission(payload) {
 
   const benefits = validateMultiChoice(payload, 'benefits', errors);
   validateExclusiveChoices(benefits, 'benefits', errors);
-  validateOtherDetail(payload, benefits, 'otherBenefit', errors);
 
   const concerns = validateMultiChoice(payload, 'concerns', errors);
   validateExclusiveChoices(concerns, 'concerns', errors);
-  validateOtherDetail(payload, concerns, 'otherConcern', errors);
 
   return { ok: errors.length === 0, errors: errors };
 }
@@ -179,10 +179,11 @@ function buildResponseRow(payload, submittedAt, responseId) {
     safeSurveySelections(restrictions),
     restrictionsVisible && restrictions.indexOf('other') !== -1 ? sanitizeCellText(data.otherRestriction) : '',
     safeSurveySelections(benefits),
-    benefits.indexOf('other') !== -1 ? sanitizeCellText(data.otherBenefit) : '',
+    sanitizeCellText(data.otherBenefit),
     safeSurveySelections(concerns),
-    concerns.indexOf('other') !== -1 ? sanitizeCellText(data.otherConcern) : '',
+    sanitizeCellText(data.otherConcern),
     sanitizeCellText(data.futurePriority),
-    sanitizeCellText(data.allowIdentification)
+    sanitizeCellText(data.allowIdentification),
+    sanitizeCellText(data.toolsUsed)
   ];
 }
