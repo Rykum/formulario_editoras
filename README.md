@@ -17,7 +17,7 @@ O formulário reúne as onze perguntas em quatro seções: identificação da ed
 
 ## Marca e tipografia
 
-O cabeçalho usa a versão horizontal colorida da marca, servida pela [página oficial da UTFPR](https://www.utfpr.edu.br/comunicacao/design/marca-da-utfpr/). A pilha tipográfica prioriza Futura MD BT, indicada no [manual de identidade visual da UTFPR](https://www.utfpr.edu.br/comunicacao/design/manual-de-uso-da-identidade-visual-da-utfpr/), e usa fontes sans-serif alternativas quando ela não está disponível.
+O cabeçalho usa a versão horizontal colorida da marca, obtida na [página oficial da UTFPR](https://www.utfpr.edu.br/comunicacao/design/marca-da-utfpr/) e embutida no HTML para evitar falhas ao carregar o endereço de download. A pilha tipográfica prioriza Futura MD BT, indicada no [manual de identidade visual da UTFPR](https://www.utfpr.edu.br/comunicacao/design/manual-de-uso-da-identidade-visual-da-utfpr/), e usa fontes sans-serif alternativas quando ela não está disponível.
 
 ## Configurar a planilha e o formulário
 
