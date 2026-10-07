@@ -42,3 +42,18 @@ test('documents the Vercel and Google Sheets setup without treating the legacy d
   assert.match(readme, /=IFERROR\(SORT\(FILTER\(Respostas!A2:S,Respostas!A2:A<>""\),3,TRUE,2,FALSE\),""\)/);
   assert.match(readme, /implanta[cç][aã]o do Apps Script[\s\S]*(?:externa|legado)[\s\S]*(?:n[aã]o|s[oó])[\s\S]*(?:migrad|desativad)/i);
 });
+
+test('configures Vercel local development at the repository root', () => {
+  const packagePath = path.join(__dirname, '..', 'package.json');
+  const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+  const readme = fs.readFileSync(readmePath, 'utf8');
+
+  assert.equal(packageJson.scripts.dev, 'node --env-file-if-exists=.env.local dev-server.js');
+  assert.equal(packageJson.devDependencies?.vercel, undefined, 'local preview must not install Vercel CLI dependencies');
+  assert.equal(packageJson.engines.node, '24.x');
+  assert.match(readme, /npm install[\s\S]*npm run dev/);
+  assert.match(readme, /raiz do reposit[oó]rio/);
+  assert.match(readme, /sem elas[\s\S]*API informa/i);
+  assert.match(readme, /servidor Node nativo/i);
+  assert.match(readme, /Vercel Function/i);
+});

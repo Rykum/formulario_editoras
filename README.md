@@ -29,7 +29,7 @@ npm test
 npm run dev
 ```
 
-O envio local requer as variáveis de ambiente descritas abaixo. Sem elas, a página abre normalmente, mas a API informa que não conseguiu registrar a resposta. A interface mantém os campos preenchidos quando ocorre uma falha.
+`npm run dev` inicia um servidor Node nativo na mesma origem para servir a página e `/api/submit`. Em produção, a Vercel publica a mesma rota como uma Vercel Function. O envio local requer as variáveis de ambiente descritas abaixo. Sem elas, a página abre normalmente, mas a API informa que não conseguiu registrar a resposta. A interface mantém os campos preenchidos quando ocorre uma falha.
 
 ## Preparar Google Sheets
 
