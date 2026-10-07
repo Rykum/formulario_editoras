@@ -16,7 +16,8 @@ test('setup creates a named response sheet with a frozen header and filter', () 
     'ID', 'Enviado em', 'Editora', 'Instituição', 'Uso de IA', 'Atividades',
     'Outra atividade', 'Política formal', 'Link da política', 'Orientação para pareceristas',
     'Restrições para pareceristas', 'Outra restrição', 'Benefícios', 'Outro benefício',
-    'Preocupações', 'Outra preocupação', 'Prioridade futura', 'Autoriza identificação'
+    'Preocupações', 'Outra preocupação', 'Prioridade futura', 'Autoriza identificação',
+    'Ferramentas de IA utilizadas ou avaliadas'
   ]);
 });
 

@@ -18,16 +18,22 @@ function createAppsScriptServices() {
   const properties = new Map();
   const sheet = {
     name: 'Sheet1', rows: [], appendCount: 0, frozenRows: 0,
-    filterCreated: false, lastSortSpec: null,
+    filterCreated: false, filter: null, lastSortSpec: null,
     setName(name) { this.name = name; return this; },
     getName() { return this.name; },
     setFrozenRows(count) { this.frozenRows = count; },
     getLastRow() { return this.rows.length; },
     getLastColumn() { return this.rows[0] ? this.rows[0].length : 0; },
+    getFilter() { return this.filter; },
     appendRow(row) { this.rows.push(row.slice()); this.appendCount += 1; },
     getRange(startRow, startColumn, rowCount = 1, columnCount = 1) {
       const currentSheet = this;
       return {
+        getValues() {
+          return Array.from({ length: rowCount }, (_, rowOffset) =>
+            Array.from({ length: columnCount }, (_, columnOffset) =>
+              currentSheet.rows[startRow - 1 + rowOffset]?.[startColumn - 1 + columnOffset] ?? ''));
+        },
         setValues(values) {
           for (let rowOffset = 0; rowOffset < rowCount; rowOffset += 1) {
             const rowIndex = startRow - 1 + rowOffset;
@@ -38,7 +44,14 @@ function createAppsScriptServices() {
           }
           return this;
         },
-        createFilter() { currentSheet.filterCreated = true; return this; },
+        createFilter() {
+          currentSheet.filterCreated = true;
+          currentSheet.filter = {
+            getRange() { return { getNumColumns: () => columnCount }; },
+            remove() { currentSheet.filterCreated = false; currentSheet.filter = null; }
+          };
+          return this;
+        },
         sort(spec) {
           currentSheet.lastSortSpec = spec;
           const start = startRow - 1;
