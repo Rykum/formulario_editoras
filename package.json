@@ -1,0 +1,14 @@
+{
+  "name": "formulario-editoras",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  },
+  "dependencies": {
+    "googleapis": "^184.0.0"
+  }
+}
