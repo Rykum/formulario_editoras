@@ -1,65 +1,107 @@
-# Pesquisa sobre IA nas editoras universitárias
+# IA nas editoras universitárias — UTFPR
 
-Landing page responsiva para uma pesquisa institucional sobre o uso de inteligência artificial generativa em editoras universitárias. O formulário reúne onze perguntas, valida as respostas no servidor e registra cada envio em uma nova linha de uma planilha Google, agrupando as respostas pelo nome da editora.
+Landing page de uma página para uma pesquisa institucional sobre práticas, orientações e percepções de IA generativa nas editoras universitárias. O formulário reúne dez perguntas numeradas, mantém os campos abertos das perguntas 07 e 08 e envia as respostas à aba `Respostas` de uma planilha Google por uma função server-side na Vercel.
 
-## Arquivos do Apps Script
+O código está preparado para Vercel e Google Sheets. A publicação ainda depende da configuração das contas e das credenciais pelo responsável. A implantação do Apps Script é externa ao Git e não foi migrada nem desativada por este repositório.
 
-| Arquivo local | Tipo no editor do Apps Script |
-| --- | --- |
-| `Code.gs` | Script |
-| `Survey.gs` | Script |
-| `Index.html` | HTML |
-| `Styles.html` | HTML |
-| `Client.html` | HTML |
-| `appsscript.json` | Manifesto do projeto |
+## Perguntas
 
-O formulário reúne as onze perguntas em quatro seções: identificação da editora; uso e orientações sobre IA; percepções e prioridades; e autorização de identificação em publicações. A pergunta 4 registra os nomes das ferramentas utilizadas ou avaliadas. As perguntas sobre benefícios e preocupações combinam seleções com campos opcionais de texto. Campos condicionais aparecem conforme as respostas.
+1. Nome da editora — texto obrigatório.
+2. Instituição à qual a editora está vinculada — texto obrigatório.
+3. Uso ou teste de IA generativa — escolha única.
+4. Atividades em que a IA é usada ou testada — múltipla seleção; nomes das ferramentas em texto. Fica visível e mostra “Não se aplica” quando a resposta à pergunta 03 indicar que não se aplica.
+5. Situação da política ou orientação formal — escolha única; link público opcional.
+6. Orientação para o uso de IA por pareceristas — escolha única; restrições complementares quando aplicável.
+7. Benefícios percebidos ou esperados — múltipla seleção e resposta aberta.
+8. Principais preocupações — múltipla seleção e resposta aberta.
+9. Prioridade futura — resposta aberta opcional.
+10. Autorização para identificar a instituição em publicações — escolha única.
 
-## Marca e tipografia
+Os campos de detalhe fazem parte do grupo correspondente, não acrescentam números nem repetem perguntas. As respostas múltiplas “nenhum” e “não sei informar” são exclusivas. O endpoint valida as respostas e acrescenta uma linha com os 19 campos compatíveis com a planilha existente.
 
-O cabeçalho usa a versão horizontal colorida da marca, obtida na [página oficial da UTFPR](https://www.utfpr.edu.br/comunicacao/design/marca-da-utfpr/) e embutida no HTML para evitar falhas ao carregar o endereço de download. A pilha tipográfica prioriza Futura MD BT, indicada no [manual de identidade visual da UTFPR](https://www.utfpr.edu.br/comunicacao/design/manual-de-uso-da-identidade-visual-da-utfpr/), e usa fontes sans-serif alternativas quando ela não está disponível.
+## Desenvolvimento local
 
-## Configurar a planilha e o formulário
-
-1. Acesse [script.google.com](https://script.google.com/) com a conta Google que será proprietária da pesquisa e crie um **Novo projeto** independente.
-2. No editor, crie os arquivos `Code.gs` e `Survey.gs` como arquivos de script. Crie `Index.html`, `Styles.html` e `Client.html` como arquivos HTML. Copie o conteúdo de cada arquivo local para o arquivo homônimo no projeto.
-3. Para configurar o manifesto, abra **Configurações do projeto**, marque **Mostrar o arquivo de manifesto `appsscript.json` no editor** e substitua o conteúdo pelo arquivo `apps-script/appsscript.json` deste repositório. Salve o projeto. Ele usa o runtime V8 e o fuso `America/Sao_Paulo`; os escopos de acesso à planilha são detectados pelo Apps Script a partir do código.
-4. No seletor de funções, escolha `setupSurveySpreadsheet()` e clique em **Executar**. Na primeira execução, revise e autorize as permissões solicitadas. A função cria a planilha **Pesquisa sobre IA nas editoras universitárias**, com uma aba **Respostas**, cabeçalho congelado e filtro. A execução também retorna e registra a URL da planilha. Se a planilha já existir, a função acrescenta a nova coluna de ferramentas ao final, preservando a posição dos dados antigos.
-5. Abra **Registro de execução** no editor após rodar a função e copie a linha `URL da planilha de respostas: ...`. Guarde esse link para analisar as respostas; não é necessário inserir o ID da planilha no código do navegador.
-
-## Implantar como aplicativo da web
-
-1. No canto superior direito do Apps Script, selecione **Implantar > Nova implantação** e escolha o tipo **App da web**.
-2. Em **Executar como**, selecione **Eu** (a conta proprietária). Assim, os envios usam a autorização do proprietário para gravar na planilha, sem pedir que cada editora acesse a planilha.
-3. Em **Quem pode acessar**, escolha a opção mais ampla que a conta permitir. Para receber respostas sem exigir login Google, essa opção precisa permitir acesso anônimo. O acesso anônimo depende das políticas do Google Workspace e das configurações administrativas da conta; se não estiver disponível, não divulgue o link como formulário sem login.
-4. Clique em **Implantar**, conclua a autorização solicitada e copie o URL do app da web. Abra o link em uma janela privada ou em outra conta para confirmar que a página carrega conforme a configuração de acesso escolhida.
-
-> A implantação como proprietário permite que qualquer pessoa com acesso ao link acione o código autorizado a gravar na planilha. O servidor usa a chave temporária do usuário do Apps Script para limitar uma resposta por chave a cada 60 minutos; essa chave não revela a identidade nem coleta o e-mail. O intervalo reduz envios repetidos, mas não impede automação coordenada ou o uso de várias contas. Compartilhe o URL somente com o público previsto e revise as permissões da própria planilha na conta proprietária. O formulário não promete anonimato nem define retenção de dados.
-
-## Verificação de um envio
-
-1. Faça um envio de teste identificando o nome da editora como `TESTE — remover depois`.
-2. Aguarde a confirmação exibida pela página e abra a aba **Respostas** da planilha.
-3. Confirme que uma nova linha foi criada e ficou junto às linhas com o mesmo nome de editora, ordenada pela data mais recente. Esse envio também confirma que a implantação consegue obter a chave temporária usada para o limite de repetição.
-4. Apague manualmente somente a linha que você identificou como teste.
-
-As respostas anteriores permanecem como linhas independentes. A planilha ordena por editora (A–Z) e, dentro de cada editora, pelos envios mais recentes primeiro.
-
-## Testes locais
-
-Com Node.js 22 ou mais recente, execute na raiz do repositório:
+Use Node.js 24.x, igual ao runtime configurado para a função Vercel.
 
 ```powershell
-node --test tests/*.test.js
+npm install
+npm test
+npm run dev
 ```
 
-Os testes cobrem validação no servidor, serialização segura para o Sheets, armazenamento, ordenação, regras condicionais do formulário e o manifesto de implantação.
+O envio local requer as variáveis de ambiente descritas abaixo. Sem elas, a página abre normalmente, mas a API informa que não conseguiu registrar a resposta. A interface mantém os campos preenchidos quando ocorre uma falha.
 
-## Referências oficiais
+## Preparar Google Sheets
 
-- [Apps Script: publicar um aplicativo da web](https://developers.google.com/apps-script/guides/web) — modos de execução, acesso e implantação.
-- [Apps Script: manifesto do projeto](https://developers.google.com/apps-script/manifest) — opções de runtime e fuso horário.
-- [Apps Script: registro de execução](https://developers.google.com/apps-script/guides/logging) — consulta de mensagens `Logger` e `console` no editor.
-- [Apps Script: comunicação com HTML Service](https://developers.google.com/apps-script/guides/html/communication) — chamadas do navegador para funções do Apps Script.
-- [Apps Script: Session](https://developers.google.com/apps-script/reference/base/session) — chave temporária que identifica um usuário sem revelar sua identidade.
-- [Apps Script: Cache Service](https://developers.google.com/apps-script/reference/cache) — armazenamento temporário usado pelo intervalo de envios.
+1. No Google Cloud Console, crie ou escolha um projeto e habilite a **Google Sheets API**.
+2. Crie uma **conta de serviço (service account)** exclusiva para o formulário e gere uma chave privada para ela. Não coloque a chave no HTML, no JavaScript do navegador, em commits ou em mensagens de chat.
+3. Compartilhe somente a planilha de respostas com o e-mail da conta de serviço, dando a permissão **Editor**. Não torne a planilha pública.
+4. Separe a URL da planilha e o ID, encontrado entre `/d/` e `/edit` no endereço da planilha.
+
+## Configurar Vercel
+
+Importe `Rykum/formulario_editoras` na Vercel usando a raiz do repositório como diretório do projeto. Não é necessário framework nem etapa de build.
+
+Adicione estas variáveis no projeto Vercel para os ambientes **Preview** e **Production**:
+
+| Variável | Valor |
+| --- | --- |
+| `GOOGLE_SHEETS_ID` | ID da planilha de respostas |
+| `GOOGLE_SERVICE_ACCOUNT_EMAIL` | E-mail da conta de serviço |
+| `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY` | Campo `private_key` da chave da conta de serviço; marque como variável **sensível (Sensitive)** |
+
+Para desenvolvimento local, copie `.env.example` para `.env.local` e preencha esses valores localmente. Arquivos `.env` e `.env.*` (exceto `.env.example`) e a pasta `.vercel` estão excluídos do Git. Se a chave privada estiver em formato com `\\n`, a função converte os separadores para que a autenticação funcione.
+
+Depois de salvar as variáveis, faça o deploy pela Vercel. A função `POST /api/submit` responde sucesso somente depois da confirmação da API Google; falhas não expõem mensagens internas ou credenciais.
+
+## Organizar as respostas por editora
+
+Mantenha a aba `Respostas` como base bruta, com o cabeçalho abaixo na linha 1 e os envios novos anexados ao final. Para uma consulta alfabética sem reordenar os dados brutos:
+
+1. Crie uma aba chamada `Respostas organizadas`.
+2. Copie o cabeçalho abaixo para a linha 1 dessa aba.
+3. Cole em `A2` a fórmula a seguir. Ela ordena por editora (A–Z) e, para cada editora, mostra primeiro o envio mais recente.
+
+```text
+=IFERROR(SORT(FILTER(Respostas!A2:S,Respostas!A2:A<>""),3,TRUE,2,FALSE),"")
+```
+
+Em planilhas configuradas para português do Brasil, talvez seja necessário usar ponto e vírgula como separador de argumentos:
+
+```text
+=IFERROR(SORT(FILTER(Respostas!A2:S;Respostas!A2:A<>"");3;TRUE;2;FALSE);"")
+```
+
+Ordem das 19 colunas:
+
+```text
+ID | Enviado em | Editora | Instituição | Uso de IA | Atividades | Outra atividade | Política formal | Link da política | Orientação para pareceristas | Restrições para pareceristas | Outra restrição | Benefícios | Outro benefício | Preocupações | Outra preocupação | Prioridade futura | Autoriza identificação | Ferramentas de IA utilizadas ou avaliadas
+```
+
+## Verificação antes de divulgar
+
+O código nesta branch ainda não confirma uma implantação Vercel nem uma gravação real na planilha. Depois de configurar as contas e publicar:
+
+1. Faça um envio de teste com a editora `TESTE — remover depois`.
+2. Confirme a mensagem de sucesso e verifique a mesma linha na aba `Respostas` e na visualização ordenada.
+3. Remova somente a linha identificada como teste.
+4. Troque o link divulgado pelo endereço Vercel. Se a equipe administra o projeto Apps Script antigo, retire a implantação anterior após confirmar a nova.
+
+A pergunta sobre autorização trata somente da identificação da instituição em publicações desta pesquisa; ela não é apresentada como consentimento geral para outras finalidades.
+
+## Arquivos do Apps Script legado
+
+O diretório `apps-script/` preserva a implementação antiga como referência. Os arquivos locais correspondem a `Code.gs`, `Survey.gs`, `Index.html`, `Styles.html`, `Client.html` e `appsscript.json` no editor do Apps Script. A implantação daquele serviço é externa ao Git: alterar ou fazer deploy deste repositório não a atualiza nem a desativa.
+
+Se a equipe precisar operar temporariamente a versão antiga, `setupSurveySpreadsheet()` cria ou prepara a aba `Respostas`. Para uma publicação antiga como aplicativo da web, a configuração era **Executar como** e selecione **Eu**; a opção de acesso anônimo depende das políticas do Google Workspace e das configurações administrativas da conta. Essas instruções são apenas de referência para o serviço legado e não configuram a função Vercel.
+
+## Marca
+
+O arquivo `public/utfpr-logo.png` usa a versão horizontal colorida disponibilizada na [página oficial da marca UTFPR](https://www.utfpr.edu.br/comunicacao/design/marca-da-utfpr/). A imagem local evita depender do servidor externo e aparece sobre a superfície clara do cabeçalho.
+
+## Referências técnicas
+
+- [Vercel Functions para Node.js](https://vercel.com/docs/functions/runtimes/node-js).
+- [Google Sheets API — append de linhas](https://developers.google.com/workspace/sheets/api/reference/rest/v4/spreadsheets.values.append).
+- [Google Identity — contas de serviço](https://developers.google.com/identity/protocols/oauth2/service-account).
+- [Variáveis de ambiente sensíveis na Vercel](https://vercel.com/docs/environment-variables/sensitive-environment-variables).

@@ -24,3 +24,21 @@ test('Apps Script manifest uses the V8 runtime and São Paulo time zone', () => 
   assert.equal(manifest.runtimeVersion, 'V8');
   assert.equal(manifest.timeZone, 'America/Sao_Paulo');
 });
+
+test('documents the Vercel and Google Sheets setup without treating the legacy deployment as migrated', () => {
+  const readme = fs.readFileSync(readmePath, 'utf8');
+  for (const text of [
+    'Vercel',
+    'Google Sheets API',
+    'GOOGLE_SHEETS_ID',
+    'GOOGLE_SERVICE_ACCOUNT_EMAIL',
+    'GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY',
+    'Respostas organizadas',
+    'service account',
+    'Apps Script'
+  ]) assert.ok(readme.includes(text), `README.md must document ${text}`);
+  assert.match(readme, /service account[\s\S]*Editor/i);
+  assert.match(readme, /vari[aá]veis de ambiente[\s\S]*sens[ií]vel/i);
+  assert.match(readme, /=IFERROR\(SORT\(FILTER\(Respostas!A2:S,Respostas!A2:A<>""\),3,TRUE,2,FALSE\),""\)/);
+  assert.match(readme, /implanta[cç][aã]o do Apps Script[\s\S]*(?:externa|legado)[\s\S]*(?:n[aã]o|s[oó])[\s\S]*(?:migrad|desativad)/i);
+});

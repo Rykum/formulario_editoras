@@ -31,9 +31,7 @@ function normalizeConditionalAnswers(answers) {
   if (!normalized.reviewerRestrictions.includes('other')) normalized.otherRestriction = '';
 
   if (!Array.isArray(normalized.benefits)) normalized.benefits = [];
-  if (!normalized.benefits.includes('other')) normalized.otherBenefit = '';
   if (!Array.isArray(normalized.concerns)) normalized.concerns = [];
-  if (!normalized.concerns.includes('other')) normalized.otherConcern = '';
   return normalized;
 }
 
@@ -65,6 +63,38 @@ function serializeSurveyForm(form) {
     allowIdentification: formData.get('allowIdentification') || '',
     website: formData.get('website') || ''
   };
+}
+
+function getSubmissionNotice(result) {
+  if (result && result.ok === true) {
+    return { kind: 'success', message: 'Resposta registrada.' };
+  }
+
+  const safeMessages = [
+    'Não foi possível validar o envio.',
+    'A solicitação excede o tamanho permitido.',
+    'Revise os campos destacados.',
+    'Não foi possível registrar a resposta agora. Tente novamente.'
+  ];
+  if (result && safeMessages.includes(result.message)) {
+    return { kind: 'error', message: result.message };
+  }
+  return { kind: 'error', message: 'Não foi possível enviar sua resposta. Tente novamente.' };
+}
+
+async function sendSurveySubmission(payload, fetchImpl = fetch) {
+  try {
+    const response = await fetchImpl('/api/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const result = await response.json();
+    if (response.ok !== true && (!result || result.ok === true)) return getSubmissionNotice(null);
+    return getSubmissionNotice(result);
+  } catch {
+    return getSubmissionNotice(null);
+  }
 }
 
 function clearConditionalControls(element) {
@@ -134,6 +164,39 @@ function updateSurveyConditionals(form) {
   updateOpenAnswerRequirement(form, 'otherConcern', 'concerns', 'other');
 }
 
+async function handleSurveySubmission(event, form, submitButton, noticeElement, fetchImpl = fetch) {
+  event.preventDefault();
+  if (typeof form.reportValidity === 'function' && !form.reportValidity()) return;
+
+  const buttonLabel = submitButton.querySelector('span');
+  const originalButtonLabel = buttonLabel.textContent;
+  submitButton.disabled = true;
+  form.setAttribute('aria-busy', 'true');
+  buttonLabel.textContent = 'Enviando…';
+  noticeElement.textContent = '';
+  noticeElement.removeAttribute('data-kind');
+
+  try {
+    const payload = normalizeConditionalAnswers(serializeSurveyForm(form));
+    const notice = await sendSurveySubmission(payload, fetchImpl);
+    noticeElement.textContent = notice.message;
+    noticeElement.dataset.kind = notice.kind;
+    if (notice.kind === 'success') {
+      form.reset();
+      updateSurveyConditionals(form);
+      const priorityField = form.querySelector('#future-priority');
+      const priorityCounter = form.querySelector('#future-priority-counter');
+      if (priorityField && priorityCounter) {
+        priorityCounter.textContent = formatCharacterCount(priorityField.value, priorityField.maxLength);
+      }
+    }
+  } finally {
+    submitButton.disabled = false;
+    form.removeAttribute('aria-busy');
+    buttonLabel.textContent = originalButtonLabel;
+  }
+}
+
 function initializeSurveyForm() {
   const form = document.getElementById('survey-form');
   if (!form) return;
@@ -153,6 +216,12 @@ function initializeSurveyForm() {
   form.addEventListener('change', (event) => {
     enforceExclusiveSelection(event.target);
     updateSurveyConditionals(form);
+  });
+
+  const submitButton = form.querySelector('button[type="submit"]');
+  const noticeElement = document.getElementById('form-notice');
+  form.addEventListener('submit', (event) => {
+    handleSurveySubmission(event, form, submitButton, noticeElement);
   });
 
   updateSurveyConditionals(form);

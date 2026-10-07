@@ -33,7 +33,7 @@ function validPayload(overrides = {}) {
   };
 }
 
-test('normalizes fields that do not apply without mutating the submitted payload', () => {
+test('normalizes hidden activity and reviewer fields without mutating the submitted payload', () => {
   const input = validPayload({
     activities: ['translation'],
     otherActivity: 'stale activity detail',
@@ -57,10 +57,26 @@ test('normalizes fields that do not apply without mutating the submitted payload
   assert.equal(normalized.policyUrl, '');
   assert.deepEqual(normalized.reviewerRestrictions, []);
   assert.equal(normalized.otherRestriction, '');
-  assert.equal(normalized.otherBenefit, '');
-  assert.equal(normalized.otherConcern, '');
+  assert.equal(normalized.otherBenefit, 'stale benefit');
+  assert.equal(normalized.otherConcern, 'stale concern');
   assert.deepEqual(input.activities, ['translation']);
   assert.equal(input.toolsUsed, 'stale tool');
+});
+
+test('preserves open benefit and concern text even when the respondent does not select other', () => {
+  const payload = validPayload({
+    benefits: ['efficiency'],
+    otherBenefit: 'Comentário sobre agilidade',
+    concerns: ['errors'],
+    otherConcern: 'Comentário sobre revisão humana'
+  });
+  const normalized = normalizeSubmission(payload);
+  const row = buildResponseRow(payload, '2026-10-07T12:00:00.000Z', 'open-text-id');
+
+  assert.equal(normalized.otherBenefit, 'Comentário sobre agilidade');
+  assert.equal(normalized.otherConcern, 'Comentário sobre revisão humana');
+  assert.equal(row[13], 'Comentário sobre agilidade');
+  assert.equal(row[15], 'Comentário sobre revisão humana');
 });
 
 test('requires details for selected other activity and reviewer restriction', () => {
